@@ -115,7 +115,7 @@ todoApp.controller("ConfigController", function($scope, $ionicLoading, $cordovaS
  *  cordovaSQLite
  */
 todoApp.controller("CategoriesController", function($scope, $ionicPlatform, $cordovaSQLite){
-  // Container for the Copes Categories.
+  // Container for the categories in this Scope.
   $scope.categories = [];
 
   // Query Database for Categiories when the platform is ready.
@@ -138,10 +138,44 @@ todoApp.controller("CategoriesController", function($scope, $ionicPlatform, $cor
   });
 });
 
-todoApp.controller("ListsController", function($scope){
+/**
+ * Controller for the Lists.
+ * Directives:
+ *  ionicPlatform   PlatformProvider
+ *  cordovaSQLite   cordovaSQLite-Plugin
+ *  stateParams     Query-Parameters from ui-router.
+ */
+todoApp.controller("ListsController", function($scope, $ionicPlatform, $cordovaSQLite, $stateParams){
+  // Container for the lists in this Scope.
+  $scope.lists = [];
 
+  // Query Database for Lists when the platform is ready.
+  $ionicPlatform.ready(function() {
+    var query = "SELECT id, category_id, todo_list_name FROM tblTodoLists WHERE category_id = ?";
+    $cordovaSQLite.execute(db, query, [$stateParams.categoryId]).then(function(result) {
+      if(result.rows.length > 0) {
+        for(var i=0; i<result.rows.length;i++) {
+          $scope.lists.push(
+            {
+              id: result.rows.items(i).id,
+              category_id: result.rows.items(i).category_id,
+              todo_list_name: result.rows.items(i).todo_list_name
+            }
+          );
+        }
+      }
+    }, function(error) {
+      console.error(error);
+    });
+  });
 });
 
-todoApp.controller("ItemsController", function($scope){
+/**
+ * Controller for the Items.
+ * Directives:
+ *  ionicPlatform   PlatformProvider
+ *  cordovaSQLite
+ */
+todoApp.controller("ItemsController", function($scope, $ionicPlatform, $cordovaSQLite){
 
 });
