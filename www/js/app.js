@@ -17,3 +17,27 @@ todoApp.run(function($ionicPlatform) {
     }
   });
 });
+
+todoApp.config(function($stateProvider ,$urlRouterProvider){
+  $stateProvider
+    .state("config", {
+      url: "/config",
+      templateUrl: "templates/config.html",
+      controller: "ConfigController",
+    })
+    .state("categories", {
+      url: "/categories",
+      templateUrl: "templates/categories.html",
+      controller: "CategoriesController",
+    })
+    .state("lists", {
+      url: "/lists/:categoryId",
+      templateUrl: "templates/lists.html",
+      controller: "ListsController",
+    })
+    .state("items", {
+      url: "/items/:listId",
+      templateUrl: "templates/items.html",
+      controller: "ItemsController",
+    });
+});
