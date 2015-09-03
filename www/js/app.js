@@ -55,8 +55,9 @@ todoApp.config(function($stateProvider ,$urlRouterProvider){
  *   'ionicLoading'  UI-Progresss during dbCopy
  *   'cordovaSQLite' cordovaSQLite-Plugin)
  *   'location'      current Location in th ui-router
+ *   'ionicPlatform' PlatformProvider
  */
-todoApp.controller("ConfigController", function($scope, $ionicLoading, $cordovaSQLite, $location, $ionicHistory){
+todoApp.controller("ConfigController", function($scope, $ionicLoading, $cordovaSQLite, $location, $ionicHistory, $ionicPlatform) {
   // Deny Backbutton in next view so that the user does not rerun this.
   $ionicHistory.nextViewOptions({
     disableAnimate: true,
@@ -107,8 +108,34 @@ todoApp.controller("ConfigController", function($scope, $ionicLoading, $cordovaS
   })
 });
 
-todoApp.controller("CategoriesController", function($scope){
+/**
+ * Controller for the Categories.
+ * Directives:
+ *  ionicPlatform   PlatformProvider
+ *  cordovaSQLite
+ */
+todoApp.controller("CategoriesController", function($scope, $ionicPlatform, $cordovaSQLite){
+  // Container for the Copes Categories.
+  $scope.categories = [];
 
+  // Query Database for Categiories when the platform is ready.
+  $ionicPlatform.ready(function() {
+    var query = "SELECT id, category_name FROM tblCategories";
+    $cordovaSQLite.execute(db, query, []).then(function(result) {
+      if(result.rows.length > 0) {
+        for(var i=0; i<result.rows.length;i++) {
+          $scope.categories.push(
+            {
+              id: result.rows.items(i).id,
+              category_name: result.rows.items(i).category_name
+            }
+          );
+        }
+      }
+    }, function(error) {
+      console.error(error);
+    });
+  });
 });
 
 todoApp.controller("ListsController", function($scope){
