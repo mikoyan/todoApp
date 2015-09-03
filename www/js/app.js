@@ -41,3 +41,20 @@ todoApp.config(function($stateProvider ,$urlRouterProvider){
       controller: "ItemsController",
     });
 });
+
+
+todoApp.controller("ConfigController", function($scope){
+
+});
+
+todoApp.controller("CategoriesController", function($scope){
+
+});
+
+todoApp.controller("ListsController", function($scope){
+
+});
+
+todoApp.controller("ItemsController", function($scope){
+
+});
