@@ -56,7 +56,7 @@ todoApp.config(function($stateProvider ,$urlRouterProvider){
  *   'cordovaSQLite' cordovaSQLite-Plugin)
  *   'location'      current Location in th ui-router
  */
-todoApp.controller("ConfigController", function($scope, $ionicLoading, $cordovaSQLite, $location){
+todoApp.controller("ConfigController", function($scope, $ionicLoading, $cordovaSQLite, $location, $ionicHistory){
   // Deny Backbutton in next view so that the user does not rerun this.
   $ionicHistory.nextViewOptions({
     disableAnimate: true,
