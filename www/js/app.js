@@ -5,6 +5,9 @@
 // the 2nd parameter is an array of 'requires'
 var todoApp = angular.module('starter', ['ionic', 'ngCordova']);
 
+// Database for this App.
+db = null;
+
 todoApp.run(function($ionicPlatform) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -42,9 +45,63 @@ todoApp.config(function($stateProvider ,$urlRouterProvider){
     });
 });
 
+/**
+ * Config - Copy prepopulated DB
+ *
+ * Directives:
+ *   'ionicLoading'  UI-Progresss during dbCopy
+ *   'cordovaSQLite' cordovaSQLite-Plugin)
+ *   'location'      current Location in th ui-router
+ */
+todoApp.controller("ConfigController", function($scope, $ionicLoading, $cordovaSQLite, $location){
+  // Deny Backbutton in next view so that the user does not rerun this.
+  $ionicHistory.nextViewOptions({
+    disableAnimate: true,
+    disableBack: true
+  });
 
-todoApp.controller("ConfigController", function($scope){
+  // Wait for the application to be ready (want to use Plugins).
+  $ionicPlatform.ready(function(){
+    // Show "Loading" until complete.
+    $ionicLoading.show({template: "Loading..."});
+    // Load SQLite on Device, use WebSQL in Browser.
+    if(window.cordova) {
+      window.plugins.sqlDB.copy("prepopulated.db", function() {
+        // Copy-Success -> open DB
+        db = $cordovaSQLite.openDB("prepopulated.db");
+        // End Loading
+        $ionicLoading.hide();
+        // Navigate away to categories
+        $location.path("/categories");
+      }, function(error) {
+        // Copy-Error.
+        db = $cordovaSQLite.openDB("prepopulated.db");
+        // End Loading
+        $ionicLoading.hide();
+        // Navigate away to categories
+        $location.path("/categories");
+      });
+    } else {
+      db = openDatabase("websql.db", "1.0", "My WebSQL Database", 2*1024*1024);
+      db.transaction(function(tx) {
+        // Drop Categories before import.
+        tx.executeSql("DROP TABLE IF EXISTS tblCategories");
 
+        // Create all necessary tables.
+        tx.executeSql("CREATE TABLE IF NOT EXISTS tblCategories (id integer primary key, category_name text)");
+        tx.executeSql("CREATE TABLE IF NOT EXISTS tblTodoLists (id integer primary key, category_id integer, todo_list_name text)");
+        tx.executeSql("CREATE TABLE IF NOT EXISTS tblTodoListItems (id integer primary key, todo_list_id integer, todo_list_item_name text)");
+
+        // Insert Default Categories.
+        tx.executeSql("INSERT INTO tblCategories (category_name) VALUES (?)", ["Shopping"])
+        tx.executeSql("INSERT INTO tblCategories (category_name) VALUES (?)", ["Chores"])
+        tx.executeSql("INSERT INTO tblCategories (category_name) VALUES (?)", ["School"])
+      });
+      // Hide Loader when the transactions are finished.
+      $ionicLoading.hide();
+      $location.path("/categories");
+    }
+  })
 });
 
 todoApp.controller("CategoriesController", function($scope){
