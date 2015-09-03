@@ -43,6 +43,9 @@ todoApp.config(function($stateProvider ,$urlRouterProvider){
       templateUrl: "templates/items.html",
       controller: "ItemsController",
     });
+
+    // Set Default to /config.
+    $urlRouterProvider.otherwise("/config");
 });
 
 /**
