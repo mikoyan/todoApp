@@ -181,7 +181,7 @@
           if(result !== undefined) {
             // INsert the ne TodoList
             var query = "INSERT INTO tblTodoLists (category_id, todo_list_name) VALUES (?,?)";
-            $cordovaSQLite.execute(db, query, [$stateParams.category_id, result]).then(function(res){
+            $cordovaSQLite.execute(db, query, [$stateParams.categoryId, result]).then(function(res){
               $scope.lists.push({
                 id: res.insertId,
                 category_id: $stateParams.categoryId,
@@ -204,6 +204,54 @@
    *  ionicPlatform   PlatformProvider
    *  cordovaSQLite
    */
-  todoApp.controller("ItemsController", function($scope, $ionicPlatform, $cordovaSQLite){
+  todoApp.controller("ItemsController", function($scope, $ionicPlatform, $cordovaSQLite, $stateParams, $ionicPopup){
+    // Container for the items in this Scope.
+    $scope.items = [];
 
+    // Query Database for items when the platform is ready.
+    $ionicPlatform.ready(function() {
+      var query = "SELECT id, todo_list_id, todo_list_item_name FROM tblTodoListItems WHERE todo_list_id = ?";
+      $cordovaSQLite.execute(db, query, [$stateParams.listId]).then(function(result) {
+        if(result.rows.length > 0) {
+          for(var i=0; i<result.rows.length;i++) {
+            $scope.items.push(
+              {
+                id: result.rows.items(i).id,
+                todo_list_id: result.rows.items(i).todo_list_id,
+                todo_list_item_name: result.rows.items(i).todo_list_item_name
+              }
+            );
+          }
+        }
+      }, function(error) {
+        console.error(error);
+      });
+    });
+
+    // Insert a new TodoList
+    scope.insert = function() {
+      $ionicPopup.prompt({
+        title: "Enter a new Todo list item",
+        inputType: "text"
+      })
+      .then(
+        function(result) {
+          if(result !== undefined) {
+            // INsert the ne TodoList
+            var query = "INSERT INTO tblTodoListItems (todo_list_id, todo_list_item_name) VALUES (?,?)";
+            $cordovaSQLite.execute(db, query, [$stateParams.listId, result]).then(function(res){
+              $scope.items.push({
+                id: res.insertId,
+                todo_list_id: $stateParams.listId,
+                todo_list_item_name: result
+              });
+            }, function(error) {
+              console.error(error);
+            });
+          } else {
+            // The User clicked "cancel".
+            console.log("Action not completed");
+          }
+        })
+    }
   });
