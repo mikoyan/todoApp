@@ -3,11 +3,10 @@
   // angular.module is a global place for creating, registering and retrieving Angular modules
   // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
   // the 2nd parameter is an array of 'requires'
+  var db = null;
   var todoApp = angular.module('starter', ['ionic', 'ngCordova']);
 
   // Database for this App.
-  db = null;
-
   todoApp.run(function($ionicPlatform) {
     $ionicPlatform.ready(function() {
       // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
@@ -72,14 +71,14 @@
       if(window.cordova) {
         window.plugins.sqlDB.copy("prepopulated.db", function() {
           // Copy-Success -> open DB
-          db = $cordovaSQLite.openDB("prepopulated.db");
+          db = $cordovaSQLite.openDatabase({name: "prepopulated.db", createFromLocation: 1});
           // End Loading
           $ionicLoading.hide();
           // Navigate away to categories
           $location.path("/categories");
         }, function(error) {
           // Copy-Error.
-          db = $cordovaSQLite.openDB("prepopulated.db");
+          db = $cordovaSQLite.openDatabase({name: "prepopulated.db", createFromLocation: 1});
           // End Loading
           $ionicLoading.hide();
           // Navigate away to categories
@@ -126,8 +125,8 @@
           for(var i=0; i<result.rows.length;i++) {
             $scope.categories.push(
               {
-                id: result.rows.items(i).id,
-                category_name: result.rows.items(i).category_name
+                id: result.rows.item(i).id,
+                category_name: result.rows.item(i).category_name
               }
             );
           }
@@ -158,9 +157,9 @@
           for(var i=0; i<result.rows.length;i++) {
             $scope.lists.push(
               {
-                id: result.rows.items(i).id,
-                category_id: result.rows.items(i).category_id,
-                todo_list_name: result.rows.items(i).todo_list_name
+                id: result.rows.item(i).id,
+                category_id: result.rows.item(i).category_id,
+                todo_list_name: result.rows.item(i).todo_list_name
               }
             );
           }
@@ -171,7 +170,7 @@
     });
 
     // Insert a new TodoList
-    scope.insert = function() {
+    $scope.insert = function() {
       $ionicPopup.prompt({
         title: "Enter a new Todo list",
         inputType: "text"
@@ -216,9 +215,9 @@
           for(var i=0; i<result.rows.length;i++) {
             $scope.items.push(
               {
-                id: result.rows.items(i).id,
-                todo_list_id: result.rows.items(i).todo_list_id,
-                todo_list_item_name: result.rows.items(i).todo_list_item_name
+                id: result.rows.item(i).id,
+                todo_list_id: result.rows.item(i).todo_list_id,
+                todo_list_item_name: result.rows.item(i).todo_list_item_name
               }
             );
           }
