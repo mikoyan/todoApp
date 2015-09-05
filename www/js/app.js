@@ -3,8 +3,8 @@
   // angular.module is a global place for creating, registering and retrieving Angular modules
   // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
   // the 2nd parameter is an array of 'requires'
-  var db = null;
   var todoApp = angular.module('starter', ['ionic', 'ngCordova']);
+  var db = null;
 
   // Database for this App.
   todoApp.run(function($ionicPlatform) {
@@ -113,13 +113,16 @@
    *  ionicPlatform   PlatformProvider
    *  cordovaSQLite
    */
-  todoApp.controller("CategoriesController", function($scope, $ionicPlatform, $cordovaSQLite){
+  todoApp.controller("CategoriesController", function($scope, $ionicPlatform, $cordovaSQLite, $location){
     // Container for the categories in this Scope.
     $scope.categories = [];
 
     // Query Database for Categiories when the platform is ready.
     $ionicPlatform.ready(function() {
-      var query = "SELECT id, category_name FROM tblCategories";
+      if (null === db) {
+        $location.path("/config");
+      }
+      var query = "SELECT id, category_name FROM tblcategories";
       $cordovaSQLite.execute(db, query, []).then(function(result) {
         if(result.rows.length > 0) {
           for(var i=0; i<result.rows.length;i++) {
@@ -145,13 +148,16 @@
    *  stateParams     Query-Parameters from ui-router.
    *  ionicPopup      ionicPopup-Service for the "Insert"
    */
-  todoApp.controller("ListsController", function($scope, $ionicPlatform, $cordovaSQLite, $stateParams, $ionicPopup){
+  todoApp.controller("ListsController", function($scope, $ionicPlatform, $cordovaSQLite, $stateParams, $ionicPopup, $location){
     // Container for the lists in this Scope.
     $scope.lists = [];
 
     // Query Database for Lists when the platform is ready.
     $ionicPlatform.ready(function() {
       var query = "SELECT id, category_id, todo_list_name FROM tblTodoLists WHERE category_id = ?";
+      if (null === db) {
+        $location.path("/config");
+      }
       $cordovaSQLite.execute(db, query, [$stateParams.categoryId]).then(function(result) {
         if(result.rows.length > 0) {
           for(var i=0; i<result.rows.length;i++) {
@@ -203,12 +209,15 @@
    *  ionicPlatform   PlatformProvider
    *  cordovaSQLite
    */
-  todoApp.controller("ItemsController", function($scope, $ionicPlatform, $cordovaSQLite, $stateParams, $ionicPopup){
+  todoApp.controller("ItemsController", function($scope, $ionicPlatform, $cordovaSQLite, $stateParams, $ionicPopup, $location){
     // Container for the items in this Scope.
     $scope.items = [];
 
     // Query Database for items when the platform is ready.
     $ionicPlatform.ready(function() {
+      if (null === db) {
+        $location.path("/config");
+      }
       var query = "SELECT id, todo_list_id, todo_list_item_name FROM tblTodoListItems WHERE todo_list_id = ?";
       $cordovaSQLite.execute(db, query, [$stateParams.listId]).then(function(result) {
         if(result.rows.length > 0) {
@@ -228,7 +237,7 @@
     });
 
     // Insert a new TodoList
-    scope.insert = function() {
+    $scope.insert = function() {
       $ionicPopup.prompt({
         title: "Enter a new Todo list item",
         inputType: "text"

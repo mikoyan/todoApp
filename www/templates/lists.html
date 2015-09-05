@@ -1,4 +1,9 @@
 <ion-view title="Lists">
+    <ion-nav-bar>
+        <ion-nav-buttons side="right">
+            <button class="right button button-icon icon ion-plus" ng-click="insert()"></button>
+        </ion-nav-buttons>
+    </ion-nav-bar>
     <ion-content>
         <ion-list>
             <ion-item ng-repeat="list in lists" href="#/items/{{list.id}}">
